@@ -1,10 +1,11 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, UserSerializer
 
 
 class RegisterView(APIView):
@@ -57,3 +58,14 @@ class LoginView(APIView):
             "refresh": str(refresh),
             "access": str(refresh.access_token)
         })
+
+
+class ProfileView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        serializer = UserSerializer(request.user)
+
+        return Response(serializer.data)

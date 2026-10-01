@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import assets from "../assets/assets";
 import ThemeToggleBtn from "./ThemeToggleBtn";
 
@@ -65,18 +66,19 @@ const Navbar = ({ theme, setTheme }) => {
           setTheme={setTheme}
         />
 
-        <a
-          href="#contact"
+        {/* Login Button */}
+        <Link
+          to="/login"
           className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2.5 rounded-full hover:scale-105 transition-all duration-300"
         >
-          Connect
+          Login
 
           <img
             src={assets.arrow}
             alt=""
             className="w-3.5 h-3.5 invert"
           />
-        </a>
+        </Link>
 
         {/* Mobile Menu */}
         <img
@@ -89,7 +91,6 @@ const Navbar = ({ theme, setTheme }) => {
       </div>
 
       {/* Mobile Sidebar */}
-
       <div
         className={`fixed top-0 right-0 h-screen w-64 bg-[#1B4332] text-white z-50 flex flex-col pt-16 pl-8 gap-7 transition-transform duration-300 sm:hidden ${
           sidebarOpen ? "translate-x-0" : "translate-x-full"
@@ -111,7 +112,7 @@ const Navbar = ({ theme, setTheme }) => {
           Services
         </a>
 
-        <a href="#why" onClick={() => setSidebarOpen(false)}>
+        <a href="#why-choose" onClick={() => setSidebarOpen(false)}>
           Why Choose
         </a>
 
@@ -122,6 +123,15 @@ const Navbar = ({ theme, setTheme }) => {
         <a href="#contact" onClick={() => setSidebarOpen(false)}>
           Contact
         </a>
+
+        {/* Mobile Login */}
+        <Link
+          to="/login"
+          onClick={() => setSidebarOpen(false)}
+          className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-2.5 rounded-full w-fit"
+        >
+          Login
+        </Link>
 
       </div>
 
