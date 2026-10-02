@@ -33,11 +33,13 @@ const FarmerLogin = () => {
       }
 
       localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
+localStorage.setItem("refresh", data.refresh);
+localStorage.setItem("username", username);
 
-      alert("Farmer login successful");
+alert("Farmer login successful");
 
-      navigate("/");
+navigate("/farmer-dashboard");
+
     } catch (error) {
       alert("Server se connect nahi ho pa raha");
     }

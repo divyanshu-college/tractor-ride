@@ -12,7 +12,8 @@ import LoginChoice from "./components/LoginChoice";
 
 import FarmerLogin from "./components/FarmerLogin";
 import OwnerLogin from "./components/OwnerLogin";
-
+import FarmerDashboard from "./components/FarmerDashboard";
+import BookingForm from "./components/BookingForm";
 
 const Home = ({ theme, setTheme }) => {
   return (
@@ -85,6 +86,16 @@ const App = () => {
           path="/owner-login"
           element={<OwnerLogin />}
         />
+
+        {/* Farmer Dashboard */}
+        <Route
+          path="/farmer-dashboard"
+          element={<FarmerDashboard />}
+        />
+        <Route
+  path="/booking"
+  element={<BookingForm />}
+/>
 
       </Routes>
 
