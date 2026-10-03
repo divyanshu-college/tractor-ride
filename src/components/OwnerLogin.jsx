@@ -32,12 +32,13 @@ const OwnerLogin = () => {
         return;
       }
 
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
+    localStorage.setItem("access", data.access);
+localStorage.setItem("refresh", data.refresh);
+localStorage.setItem("username", username);
 
       alert("Owner login successful");
 
-      navigate("/");
+   navigate("/owner-dashboard");
     } catch (error) {
       alert("Server se connect nahi ho pa raha");
     }

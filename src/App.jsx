@@ -14,6 +14,8 @@ import FarmerLogin from "./components/FarmerLogin";
 import OwnerLogin from "./components/OwnerLogin";
 import FarmerDashboard from "./components/FarmerDashboard";
 import BookingForm from "./components/BookingForm";
+import OwnerDashboard from "./components/OwnerDashboard";
+
 
 const Home = ({ theme, setTheme }) => {
   return (
@@ -97,6 +99,10 @@ const App = () => {
   element={<BookingForm />}
 />
 
+<Route
+  path="/owner-dashboard"
+  element={<OwnerDashboard />}
+/>
       </Routes>
 
     </BrowserRouter>
