@@ -1,3 +1,5 @@
+from datetime import date
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -38,6 +40,7 @@ class BookingListCreateView(APIView):
 
     def post(self, request):
 
+        # Only farmer can create booking
         if request.user.role != "farmer":
 
             return Response(
@@ -47,6 +50,126 @@ class BookingListCreateView(APIView):
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        # Check required data
+        tractor_id = request.data.get("tractor")
+        booking_date = request.data.get("date")
+        hours = request.data.get("hours")
+
+        if not tractor_id:
+
+            return Response(
+                {
+                    "error": "Tractor is required"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not booking_date:
+
+            return Response(
+                {
+                    "error": "Date is required"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not hours:
+
+            return Response(
+                {
+                    "error": "Hours is required"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check hours
+        try:
+            hours = int(hours)
+
+        except ValueError:
+
+            return Response(
+                {
+                    "error": "Hours must be a valid number"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if hours <= 0:
+
+            return Response(
+                {
+                    "error": "Hours must be greater than 0"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check date
+        try:
+            booking_date_obj = date.fromisoformat(booking_date)
+
+        except ValueError:
+
+            return Response(
+                {
+                    "error": "Invalid date format"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if booking_date_obj < date.today():
+
+            return Response(
+                {
+                    "error": "You cannot book a tractor for a past date"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check tractor
+        try:
+            from tractors.models import Tractor
+
+            tractor = Tractor.objects.get(
+                id=tractor_id
+            )
+
+        except Tractor.DoesNotExist:
+
+            return Response(
+                {
+                    "error": "Tractor not found"
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Check tractor availability
+        if not tractor.available:
+
+            return Response(
+                {
+                    "error": "This tractor is currently unavailable"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check duplicate booking
+        existing_booking = Booking.objects.filter(
+            tractor=tractor,
+            date=booking_date_obj,
+            status__in=["pending", "accepted"]
+        ).exists()
+
+        if existing_booking:
+
+            return Response(
+                {
+                    "error": "This tractor is already booked for this date"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Create booking
         serializer = BookingSerializer(
             data=request.data
         )
@@ -110,6 +233,8 @@ class BookingActionView(APIView):
                 )
 
             booking.status = "accepted"
+            booking.tractor.available = True
+            booking.tractor.save()
 
         elif action == "reject":
 
@@ -154,6 +279,9 @@ class BookingActionView(APIView):
                 )
 
             booking.status = "completed"
+
+            booking.tractor.available = True
+            booking.tractor.save()
 
         elif action == "cancel":
 
