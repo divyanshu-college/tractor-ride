@@ -14,7 +14,21 @@ class ReviewListCreateView(APIView):
 
     def get(self, request):
 
-        reviews = Review.objects.all().order_by("-created_at")
+        if request.user.role == "owner":
+
+            reviews = Review.objects.filter(
+                tractor__owner=request.user
+            ).order_by("-created_at")
+
+        elif request.user.role == "farmer":
+
+            reviews = Review.objects.filter(
+                farmer=request.user
+            ).order_by("-created_at")
+
+        else:
+
+            reviews = Review.objects.none()
 
         serializer = ReviewSerializer(
             reviews,
@@ -27,8 +41,11 @@ class ReviewListCreateView(APIView):
 
         # Sirf farmer review de sakta hai
         if request.user.role != "farmer":
+
             return Response(
-                {"error": "Only farmers can give reviews"},
+                {
+                    "error": "Only farmers can give reviews"
+                },
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -39,75 +56,114 @@ class ReviewListCreateView(APIView):
 
         # Basic validation
         if not booking_id:
+
             return Response(
-                {"error": "Booking is required"},
+                {
+                    "error": "Booking is required"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if not tractor_id:
+
             return Response(
-                {"error": "Tractor is required"},
+                {
+                    "error": "Tractor is required"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if not rating:
+
             return Response(
-                {"error": "Rating is required"},
+                {
+                    "error": "Rating is required"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Rating 1-5 hona chahiye
+        # Rating check
         try:
+
             rating = int(rating)
+
         except ValueError:
+
             return Response(
-                {"error": "Rating must be a number"},
+                {
+                    "error": "Rating must be a number"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if rating < 1 or rating > 5:
+
             return Response(
-                {"error": "Rating must be between 1 and 5"},
+                {
+                    "error": "Rating must be between 1 and 5"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         # Booking check
         try:
-            booking = Booking.objects.get(id=booking_id)
+
+            booking = Booking.objects.get(
+                id=booking_id
+            )
+
         except Booking.DoesNotExist:
+
             return Response(
-                {"error": "Booking not found"},
+                {
+                    "error": "Booking not found"
+                },
                 status=status.HTTP_404_NOT_FOUND
             )
 
         # Booking farmer ki hi honi chahiye
         if booking.farmer != request.user:
+
             return Response(
-                {"error": "You can review only your own booking"},
+                {
+                    "error": "You can review only your own booking"
+                },
                 status=status.HTTP_403_FORBIDDEN
             )
 
         # Booking completed honi chahiye
         if booking.status != "completed":
+
             return Response(
-                {"error": "You can review only completed bookings"},
+                {
+                    "error": "You can review only completed bookings"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         # Tractor booking wala hi hona chahiye
         if booking.tractor.id != int(tractor_id):
+
             return Response(
-                {"error": "This tractor does not belong to this booking"},
+                {
+                    "error": "This tractor does not belong to this booking"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         # Already reviewed?
-        if Review.objects.filter(booking=booking).exists():
+        if Review.objects.filter(
+            booking=booking
+        ).exists():
+
             return Response(
-                {"error": "This booking has already been reviewed"},
+                {
+                    "error": "This booking has already been reviewed"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Create review
         review = Review.objects.create(
             farmer=request.user,
             tractor=booking.tractor,
