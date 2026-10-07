@@ -1,3 +1,4 @@
+
 from rest_framework import serializers
 from .models import Tractor
 
@@ -13,5 +14,7 @@ class TractorSerializer(serializers.ModelSerializer):
             'tractor_number',
             'price_per_hour',
             'location',
-            'available'
+            'available',
+            'image',
+            'video'
         ]
