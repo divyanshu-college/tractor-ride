@@ -1,3 +1,11 @@
+import os
+from pathlib import Path
+from datetime import timedelta
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
 """
 Django settings for config project.
 
@@ -8,8 +16,7 @@ from pathlib import Path
 from datetime import timedelta
 
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -40,6 +47,7 @@ INSTALLED_APPS = [
     'tractors',
     'bookings',
     'reviews',
+    'payments',
 ]
 
 
@@ -197,3 +205,5 @@ SIMPLE_JWT = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")

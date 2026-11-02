@@ -49,7 +49,9 @@ const BookingForm = () => {
 
       const data = await response.json();
 
-      if (!response.ok) {
+console.log("Booking Response:", data);
+
+if (!response.ok) {
         console.log(data);
         alert("Booking failed");
         return;
